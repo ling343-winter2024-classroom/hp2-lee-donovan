@@ -74,7 +74,7 @@ subj_tokens
 ```
 Now there are `r nrow(obj_tokens)` tokens in the objective dataset and `r nrow(subj_tokens)` tokens in the subjective dataset, and we can see how almost half of the original dataset was filled with those stopwords. Although we can see the amount of the more important tokens in each of the datasets, we still don't know what this really entails.
 
-##
+---
 
 Perhaps if we divide this large count into smaller counts, we can get a better idea of what it means to be objective and subjective when talking about films. We can count up each unique token in each dataset and see the tokens that appear the most times:
 
@@ -133,7 +133,7 @@ In the objective dataset, nothing appears to be off the mark: "life", "story", "
 
 On the otherhand, the subjective dataset gleans some interesting things. For one thing, we can see that the words "film" and "movie" outnumber the rest of the word with counts of 740 and 642, when the third most common word "story" appears 234 times. Since this dataset was derived from film reviews, it would make sense that these words are the most common: the reviews are talking about the films themselves than giving a plot summary. We can also see words that can describe the vibe of a film: "comedy", "funny", "bad", "action", and "drama", and we can see words that can reference the validity of the film's writing: "characters" and "makes". "director" also appears in this top set, so it can be that many reviewers reference the people responsible for the creation of the film they are reviewing.
 
-##
+---
 
 We can also attempt a sentiment analysis for each of the dataset. For this analysis, we will use Bing Liu's sentiment evaluations.
 
@@ -232,7 +232,7 @@ Looking at the objective dataset visuals, we can see a clear outlier with the wo
 
 Now looking at the subjective dataset visuals, there are clear oddities present in the negative words; "funny" and "plot" are considered to be negative and are within the Top 3. It can be said that "funny" is synonymous with words such as "humor" and "entertaining", which are present in the positive words. Speaking of the positive words, we can also see that the word "love" is the most common positive word. Comparing the two datasets, we can say that "love" in the objective dataset is talking more about film plots with romantic elements ("Romeo loves Juliet") and "love" in the subjective dataset is a reviewer praising the film ("I love how...").
 
-##
+---
 
 All of our analysis so far as been dealing with single tokens, and this could cause some context to be lost. We can attempt to utilize a bigram model for each of the datasets to add more context to each of the words. We will also remove any stopwords present in these bigrams as they tend to be non-relevant and fill up the dataframe. After cleaning, we will then see the most frequent bigrams present in both datasets:
 ```{r}
@@ -302,7 +302,7 @@ Looking at the objective dataset's bigrams, we can see that "los angeles" is the
 
 Now looking at the subjective dataset's bigrams, we can see that "writer director" is on the top, which makes sense since reviewers are likely to talk about who wrote and who directed the films. We also can see bigrams that relate to the production of films present in here such as "special effects", "action sequences", and "low budget". Bigrams that can describe what the film is about are also present here; "romantic comedy", "character study", "soap opera", "real life", "live story", "subject matter", "action movie", and "human nature" are some examples. There are also bigrams that relate to the length of the film: "running time" and "feature length". "de niro" is the odd one out here in the top, but further research shows that Robert De Niro is a well-known American actor and producer which can explain why its common in this dataset.
 
-##
+---
 
 So far, we've been looking at these datasets separately, so why don't we try and combine the two into one. Using this newly combined dataset, we can find the tf-idf (term frequency - inverse document frequency) for each word, and this will tell us some information about the important words that are relevant to this dataset.
 ```{r}
@@ -338,4 +338,4 @@ Throughout this analysis, we have found the number of tokens in each dataset, se
 
 For further analysis, I think that trying to further categorize these film summaries and film reviews to different genres, so summaries/reviews that have a lot of words relating to humor could be classified as "comedy" and those that have a lot of words such as "scary", "anticipation", and "chilling" could be classified as "horror". Or we could the opposite process and find the most important words for these genres when given a dataset categorized by them.
 
-##
+---
