@@ -1,5 +1,5 @@
 ---
-title: "Homework Project 02"
+title: "Homework Project 2: Electric Boogaloo"
 author: "Donovan Lee"
 date: 04-23-2024
 format:
@@ -7,8 +7,6 @@ format:
     code-fold: true
     embed-resources: true
 ---
-##
-
 
 ## Set-Up
 ```{r}
@@ -21,10 +19,8 @@ library(here)
 library(gt)
 ```
 
-
 ## What's This Data?
-This data was obtained from the [subjectivity dataset v1.0](https://www.cs.cornell.edu/people/pabo/movie-review-data/). From this download, we are given a zipped file, rotten_imbd which contains three files: subjdata.README.1.0, plot.tok.gt9.5000, and quote.tok.gt9.5000.\n\n
-
+This data was obtained from the [subjectivity dataset v1.0](https://www.cs.cornell.edu/people/pabo/movie-review-data/). From this download, we are given a zipped file, rotten_imbd which contains three files: subjdata.README.1.0, plot.tok.gt9.5000, and quote.tok.gt9.5000.
 ```{r}
 #| echo: false
 
@@ -37,9 +33,7 @@ tibble::tribble(
   opt_row_striping() |>
   opt_stylize(style = 6, color = "red", add_row_striping = TRUE)
 ```
-
-From the README, the two files are separated into two categories: objective and subjective. The plot file is labeled as the objective category and the quote file is labeled as the subjective category.
-
+From the README, the two files are separated into two categories: objective and subjective with the plot file is labeled as the objective category and the quote file is labeled as the subjective category.
 
 ## Importing the Data
 In order to analyze this dataset, we have to import the files into a format that allows us to easily modify it.
@@ -53,7 +47,7 @@ subj_data <- read_tsv(here("rotten_imdb/quote.tok.gt9.5000"), col_names = "sente
 obj_data
 subj_data
 ```
-Here, we are able to create a dataframe that contains two variables: sent_id for the sentence number and sentence for the actual sentence content.\n\n
+Here, we are able to create a dataframe that contains two variables: sent_id for the sentence number and sentence for the actual sentence content.
 
 ## Time for Analysis!
 Since we are looking at a large swath of words, we can attempt to do some analysis using tokens. But first, we will have to tokenize the sentences:
@@ -79,6 +73,8 @@ obj_tokens
 subj_tokens
 ```
 Now there are `r nrow(obj_tokens)` tokens in the objective dataset and `r nrow(subj_tokens)` tokens in the subjective dataset, and we can see how almost half of the original dataset was filled with those stopwords. Although we can see the amount of the more important tokens in each of the datasets, we still don't know what this really entails.
+
+##
 
 Perhaps if we divide this large count into smaller counts, we can get a better idea of what it means to be objective and subjective when talking about films. We can count up each unique token in each dataset and see the tokens that appear the most times:
 
@@ -114,7 +110,7 @@ obj_tokens |>
   count(word, sort = TRUE) |>
   slice(1:15) |>
   ggplot(aes(x = n, y = reorder(word, n))) +
-  geom_col(fill = "darkgreen") +
+  geom_col(fill = "navyblue") +
   labs(
     title = "Top 15 Objective Words",
     x = "# of Appearances",
@@ -131,7 +127,13 @@ subj_tokens |>
     y = "Word"
   )
 ```
-Looking at these visuals, we can now see some tangible information about these two datasets. In the objective dataset, nothing appears to be off the mark: life, story, world, and film are words that would be commonly found in sentences that discuss a film's plot. On the otherhand, the subjective dataset gleans some interesting things. For one thing, we can see that the words "film" and "movie" outnumber the rest of the word with counts of 740 and 642, when the third most common word "story" appears 234 times. Speaking of the most common words in the subjective dataset, since it was derived from film reviews, it would make sense that "film", "movie", and "story" are the most common: the reviews are talking about the films themselves than giving a plot summary.
+Looking at these visuals, we can now see some tangible information about these two datasets. 
+
+In the objective dataset, nothing appears to be off the mark: "life", "story", "world", "film", "time" and "day" are words that would be commonly found in sentences that discuss a film's plot and setting. "love", "family", "father", "girl", "friends", "woman", "home", and "mother" are all words that can describe characters and character dynamics.
+
+On the otherhand, the subjective dataset gleans some interesting things. For one thing, we can see that the words "film" and "movie" outnumber the rest of the word with counts of 740 and 642, when the third most common word "story" appears 234 times. Since this dataset was derived from film reviews, it would make sense that these words are the most common: the reviews are talking about the films themselves than giving a plot summary. We can also see words that can describe the vibe of a film: "comedy", "funny", "bad", "action", and "drama", and we can see words that can reference the validity of the film's writing: "characters" and "makes". "director" also appears in this top set, so it can be that many reviewers reference the people responsible for the creation of the film they are reviewing.
+
+##
 
 We can also attempt a sentiment analysis for each of the dataset. For this analysis, we will use Bing Liu's sentiment evaluations.
 
@@ -230,6 +232,8 @@ Looking at the objective dataset visuals, we can see a clear outlier with the wo
 
 Now looking at the subjective dataset visuals, there are clear oddities present in the negative words; "funny" and "plot" are considered to be negative and are within the Top 3. It can be said that "funny" is synonymous with words such as "humor" and "entertaining", which are present in the positive words. Speaking of the positive words, we can also see that the word "love" is the most common positive word. Comparing the two datasets, we can say that "love" in the objective dataset is talking more about film plots with romantic elements ("Romeo loves Juliet") and "love" in the subjective dataset is a reviewer praising the film ("I love how...").
 
+##
+
 All of our analysis so far as been dealing with single tokens, and this could cause some context to be lost. We can attempt to utilize a bigram model for each of the datasets to add more context to each of the words. We will also remove any stopwords present in these bigrams as they tend to be non-relevant and fill up the dataframe. After cleaning, we will then see the most frequent bigrams present in both datasets:
 ```{r}
 obj_bigram <- obj_data |>
@@ -271,11 +275,13 @@ subj_bigram |>
 ```
 ### Graph Visual
 ```{r}
+#| layout-nrow: 2
+
 obj_bigram |>
   unite(col = "bigram", c("word1", "word2"), sep = " ") |>
   slice(1:15) |>
   ggplot(aes(x = n, y = reorder(bigram, n))) +
-  geom_col(fill = "darkgreen") +
+  geom_col(fill = "navyblue") +
   labs(
     title = "Top 15 Objective Bigrams",
     x = "# of Appearances",
@@ -292,7 +298,11 @@ subj_bigram |>
     y = "Bigram"
   )
 ```
+Looking at the objective dataset's bigrams, we can see that "los angeles" is the most common, so it appears that the city appears a lot in the settings of films. The same can be said for "york city" (new york city I would assume) and "las vegas". Time settings also appear in the top with bigrams such as "world war" and "modern day". There are also a lot of bigramss that appear to briefly describe what the film is about such as "true story", "true love", "martial arts", "romantic comedy", and "love story", and there also bigrams that appear to describe characters: "drug dealer", "african american", "serial killer", and "free spirited". The only weird bigram present here is "fianc 233"; this is perhaps an important topic to a series of films?
 
+Now looking at the subjective dataset's bigrams, we can see that "writer director" is on the top, which makes sense since reviewers are likely to talk about who wrote and who directed the films. We also can see bigrams that relate to the production of films present in here such as "special effects", "action sequences", and "low budget". Bigrams that can describe what the film is about are also present here; "romantic comedy", "character study", "soap opera", "real life", "live story", "subject matter", "action movie", and "human nature" are some examples. There are also bigrams that relate to the length of the film: "running time" and "feature length". "de niro" is the odd one out here in the top, but further research shows that Robert De Niro is a well-known American actor and producer which can explain why its common in this dataset.
+
+##
 
 So far, we've been looking at these datasets separately, so why don't we try and combine the two into one. Using this newly combined dataset, we can find the tf-idf (term frequency - inverse document frequency) for each word, and this will tell us some information about the important words that are relevant to this dataset.
 ```{r}
@@ -312,19 +322,20 @@ total_tokens |>
   ggplot(aes(x = tf_idf, y = reorder(word, tf_idf), fill = group)) + 
   geom_col(show.legend = FALSE) +
   facet_wrap(~group, scales = "free_y") +
-  scale_fill_manual(values = c("darkgreen", "gold")) +
+  scale_fill_manual(values = c("navyblue", "gold")) +
   labs(
     title = "The Most Important Words Based on tf-idf",
     x = "Word",
     y = "tf-idf",
   )
 ```
-We will first explore the objective set of words. According to this graph, we see that "discovers" is the most important word by far in this dataset, and I believe that this make sense as many films are about the main characters experiencing something new, or discovering. We can also see some names such as "rachel", "matt", and "patricia", and this make sense since a lot of plot synopsis include the characters' names (in this case, these names perhaps appear the most). There are also similar words like "government", "security", and "fbi", all of each can describe a common film trope dealing with conspiracy or something grand in the social world. Not all appears to be right though as the numbers "233" and "38" appear in this set, but it could be caused by the idea that these numbers appear the most frequently in all of the film plots.
+We will first explore the objective set of words. According to this graph, we see that "discovers" is the most important word by far in this dataset, and I believe that this make sense as many films are about the main characters experiencing something new, or discovering. We can also see some names such as "rachel", "matt", and "patricia", and this make sense since a lot of plot synopsis include the characters' names (in this case, these names perhaps appear the most). There are also similar words like "government", "security", and "fbi", all of each can describe a common film trope dealing with conspiracy or something grand in the social world. Not all appears to be standard though as the numbers "233" and "38" appear in this set, but it could be caused by the idea that these numbers appear the most frequently in all of the film plots as we have seen with "fianc 233" in the bigram analysis.
 
 Now exploring the subjective set of words, no word appears to be a clear outlier in importance. We can see a lot of adjectives present in this set such as  "predictable", "enjoyable", "worthy", "dumb", and "pretentious", and since all of the subjective dataset comes from film reviews, it would make sense that adjectives would have a greater importance in the dataset. This explanation can be applied for "movie's" since many critics are likely to discuss the things that a film possesses. We can also see a lot of words relating to humor: "laughs", "laugh", and "gags", things that can be associated with reaction, so these would make sense as important words in a film review.
 
-
 ## Some Final Thoughts
-Throughout this analysis, we have found the number of tokens in each dataset, seen the most frequent words, evaluated the sentiments of the dataset, looked at the bigrams, and explained the important words for each dataset. There clearly were differences between the two dataset and their word choices.
+Throughout this analysis, we have found the number of tokens in each dataset, seen the most frequent words, evaluated the sentiments of the dataset, looked at the bigrams, and explained the important words for each dataset. We could see that there were significant difference in word content between the objective dataset (comprised of film summaries) and the subjective dataset (comprised of film reviews): the objective dataset were more biased towards terms explaining the film's plot while the subjective dataset was more biased towards terms explaining the reactions to the film.
+
+For further analysis, I think that trying to further categorize these film summaries and film reviews to different genres, so summaries/reviews that have a lot of words relating to humor could be classified as "comedy" and those that have a lot of words such as "scary", "anticipation", and "chilling" could be classified as "horror". Or we could the opposite process and find the most important words for these genres when given a dataset categorized by them.
 
 ##
